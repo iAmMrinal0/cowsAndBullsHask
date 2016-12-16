@@ -7,6 +7,10 @@ import System.Random
 data GameState = GameState { numberToGuess :: [Integer], numOfTries :: Integer } deriving (Show)
 
 
+numOfChances :: Integer
+numOfChances = 20
+
+
 listInt :: Integer -> [Integer]
 listInt 0 = []
 listInt num = listInt (num `div` 10) ++ [num `mod` 10]
@@ -23,7 +27,7 @@ generate = do
   num <- randomRIO(1001, 9999)
   if checkList (listInt num)
      then
-       return $ GameState (listInt num) 20
+       return $ GameState (listInt num) numOfChances
      else
        generate
 
