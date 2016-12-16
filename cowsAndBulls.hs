@@ -15,14 +15,14 @@ listInt num = listInt (num `div` 10) ++ [num `mod` 10]
 checkList :: [Integer] -> Bool
 checkList list = case list of
   [] -> True
-  (x:xs) -> (x `notElem` xs && checkList xs)
+  (x:xs) -> x `notElem` xs && checkList xs
 
 
 generate :: IO GameState
 generate = do
   num <- randomRIO(1001, 9999)
   if checkList (listInt num)
-     then do
+     then
        return $ GameState (listInt num) 20
      else
        generate
@@ -33,16 +33,16 @@ getInput = getLine
 
 
 strInt :: String -> [Integer]
-strInt input = map (read . (:[])) input
+strInt = map (read . (:[]))
 
 
 checkCow :: [Integer] -> [Integer] -> Integer
 checkCow input guess =
-  (go input guess 0) - (checkBull input guess)
+  go input guess 0 - checkBull input guess
   where
     go :: [Integer] -> [Integer] -> Integer -> Integer
     go _ [] acc = acc
-    go input (x:xs) acc = if elem x input
+    go input (x:xs) acc = if x `elem` input
                              then
                                go input xs (acc + 1)
                              else
@@ -57,32 +57,41 @@ checkBull (x:xs) (y:ys) = if x == y
                              else
                                checkBull xs ys
 
+
+validateInput :: [Integer] -> Bool
+validateInput input = length input > 4 || not (checkList input)
+
+
 verifyInput :: GameState -> String -> IO GameState
 verifyInput gs num = do
   let input = strInt num
-      cow = checkCow input (numberToGuess gs)
-      bull = checkBull input (numberToGuess gs)
-  if bull == 4
+  if validateInput input
      then do
-       putStrLn "You won!"
-       runGame
+       input <- getInput
+       verifyInput gs input
      else do
-       printCowBull cow bull
-       if numOfTries gs == 1
+       let cow = checkCow input (numberToGuess gs)
+           bull = checkBull input (numberToGuess gs)
+       if bull == 4
           then do
-            putStrLn $ "You lose! The number is " ++ (show $ numberToGuess gs)
+            putStrLn "You won!"
             runGame
-          else
-            do
-              return $ decrGameState gs
-      
+          else do
+            printCowBull cow bull
+            if numOfTries gs == 1
+               then do
+                 putStrLn $ "You lose! The number is " ++ show (numberToGuess gs)
+                 runGame
+               else
+                 return $ decrGameState gs
+       
   
 decrGameState :: GameState -> GameState
 decrGameState (GameState numG numT) = GameState numG (numT - 1)
 
 
 printCowBull :: Integer -> Integer -> IO ()
-printCowBull cow bull = putStrLn $ (show cow) ++ " cows " ++ (show bull) ++ " bulls"
+printCowBull cow bull = putStrLn $ show cow ++ " cows " ++ show bull ++ " bulls"
 
 
 runGame :: IO GameState
