@@ -89,10 +89,14 @@ winOrLose (cow, bull) gs = if bull == 4
                                gameOver gs
 
 
+joiner :: [Integer] -> Integer
+joiner = read . concatMap show
+
+
 gameOver :: GameState -> IO GameState
 gameOver gs = if numOfTries gs == 1
                  then do
-                   putStrLn $ "You lose! The number is " ++ show (numberToGuess gs)
+                   putStrLn $ "You lose! The number is " ++ show (joiner (numberToGuess gs))
                    runGame
                  else
                    return $ decrGameState gs
