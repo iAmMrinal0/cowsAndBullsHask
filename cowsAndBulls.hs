@@ -85,7 +85,7 @@ winOrLose (cow, bull) gs = if bull == 4
                                putStrLn "You won!"
                                runGame
                              else do
-                               printCowBull cow bull
+                               printCowBull cow bull gs
                                gameOver gs
 
 
@@ -102,8 +102,8 @@ decrGameState :: GameState -> GameState
 decrGameState (GameState numG numT) = GameState numG (numT - 1)
 
 
-printCowBull :: Integer -> Integer -> IO ()
-printCowBull cow bull = putStrLn $ show cow ++ " cows " ++ show bull ++ " bulls"
+printCowBull :: Integer -> Integer -> GameState -> IO ()
+printCowBull cow bull gs = putStrLn $ show cow ++ " cows " ++ show bull ++ " bulls and " ++ show (numOfTries gs - 1) ++ " tries left"
 
 
 runGame :: IO GameState
