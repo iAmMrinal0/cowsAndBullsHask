@@ -71,24 +71,33 @@ verifyGameOver gs num = do
   let input = strInt num
   if validateInput input
      then do
+       putStrLn "Incorrect input!"
        input <- getInput
        verifyGameOver gs input
      else do
        let (cow, bull) = valCowBull gs input
-       if bull == 4
-          then do
-            putStrLn "You won!"
-            runGame
-          else do
-            printCowBull cow bull
-            if numOfTries gs == 1
-               then do
-                 putStrLn $ "You lose! The number is " ++ show (numberToGuess gs)
-                 runGame
-               else
-                 return $ decrGameState gs
-       
-  
+       winOrLose (cow, bull) gs
+
+
+winOrLose :: (Integer, Integer) -> GameState -> IO GameState
+winOrLose (cow, bull) gs = if bull == 4
+                             then do
+                               putStrLn "You won!"
+                               runGame
+                             else do
+                               printCowBull cow bull
+                               gameOver gs
+
+
+gameOver :: GameState -> IO GameState
+gameOver gs = if numOfTries gs == 1
+                 then do
+                   putStrLn $ "You lose! The number is " ++ show (numberToGuess gs)
+                   runGame
+                 else
+                   return $ decrGameState gs
+
+
 decrGameState :: GameState -> GameState
 decrGameState (GameState numG numT) = GameState numG (numT - 1)
 
