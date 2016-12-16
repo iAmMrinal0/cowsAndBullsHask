@@ -62,16 +62,19 @@ validateInput :: [Integer] -> Bool
 validateInput input = length input > 4 || not (checkList input)
 
 
-verifyInput :: GameState -> String -> IO GameState
-verifyInput gs num = do
+valCowBull :: GameState -> [Integer] -> (Integer, Integer)
+valCowBull gs input = (checkCow input (numberToGuess gs), checkBull input (numberToGuess gs))
+
+
+verifyGameOver :: GameState -> String -> IO GameState
+verifyGameOver gs num = do
   let input = strInt num
   if validateInput input
      then do
        input <- getInput
-       verifyInput gs input
+       verifyGameOver gs input
      else do
-       let cow = checkCow input (numberToGuess gs)
-           bull = checkBull input (numberToGuess gs)
+       let (cow, bull) = valCowBull gs input
        if bull == 4
           then do
             putStrLn "You won!"
@@ -104,7 +107,7 @@ runGame = do
 gameLoop :: GameState -> IO GameState
 gameLoop gs = do
   input <- getInput
-  gs1 <- verifyInput gs input
+  gs1 <- verifyGameOver gs input
   gameLoop gs1
    
 
