@@ -11,6 +11,10 @@ numOfChances :: Integer
 numOfChances = 20
 
 
+numLength :: Integer
+numLength = 4
+
+
 listInt :: Integer -> [Integer]
 listInt 0 = []
 listInt num = listInt (num `div` 10) ++ [num `mod` 10]
@@ -24,7 +28,7 @@ checkList list = case list of
 
 generate :: IO GameState
 generate = do
-  num <- randomRIO(1001, 9999)
+  num <- randomRIO(1023, 9678)
   if checkList (listInt num)
      then
        return $ GameState (listInt num) numOfChances
@@ -63,7 +67,7 @@ checkBull (x:xs) (y:ys) = if x == y
 
 
 validateInput :: [Integer] -> Bool
-validateInput input = length input > 4 || not (checkList input)
+validateInput input = length input > fromIntegral numLength || not (checkList input)
 
 
 valCowBull :: GameState -> [Integer] -> (Integer, Integer)
@@ -84,7 +88,7 @@ verifyGameOver gs num = do
 
 
 winOrLose :: (Integer, Integer) -> GameState -> IO GameState
-winOrLose (cow, bull) gs = if bull == 4
+winOrLose (cow, bull) gs = if bull == fromIntegral numLength
                              then do
                                putStrLn "You won!"
                                runGame
